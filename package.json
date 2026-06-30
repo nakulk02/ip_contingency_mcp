@@ -7,13 +7,16 @@
   "scripts": {
     "build": "tsc",
     "dev": "node --loader ts-node/esm src/index.ts",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "type-check": "tsc --noEmit"
   },
   "keywords": [
     "mcp",
     "ip-compliance",
-    "intelligence",
-    "anthropic"
+    "intelligence"
   ],
   "author": "",
   "license": "ISC",
@@ -23,6 +26,13 @@
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
-    "typescript": "^5.3.3"
+    "@typescript-eslint/eslint-plugin": "^8.62.1",
+    "@typescript-eslint/parser": "^8.62.1",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "prettier": "^3.9.4",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.62.1"
   }
 }
