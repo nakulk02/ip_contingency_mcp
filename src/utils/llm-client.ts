@@ -19,7 +19,7 @@ export async function callLLM(
   systemPrompt: string,
   params: MessageParams = {}
 ): Promise<string> {
-  const { model = "claude-opus-4-6", maxTokens = 2000 } = params;
+  const { model = "claude-sonnet-5", maxTokens = 2000 } = params;
 
   let message;
   try {
