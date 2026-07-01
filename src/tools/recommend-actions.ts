@@ -1,4 +1,4 @@
-import { callLLMJSON } from "../utils/llm-client".js";
+import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, Recommendation, ToolResponse } from "../types/index.js";
 import { formatGapForAnalysis } from "../utils/data-formatter.js";
@@ -34,11 +34,9 @@ ${formattedGap}
 Provide specific, actionable recommendations for next steps.
     `.trim();
 
-    const result = await callLLMJSON<Recommendation>(
-      userMessage,
-      getPrompt("RECOMMEND_ACTIONS"),
-      { maxTokens: 1500 }
-    );
+    const result = await callLLMJSON<Recommendation>(userMessage, getPrompt("RECOMMEND_ACTIONS"), {
+      maxTokens: 1500,
+    });
 
     // Ensure gapId is included
     result.gapId = gap.id;

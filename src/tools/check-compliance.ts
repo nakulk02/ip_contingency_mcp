@@ -1,4 +1,4 @@
-import { callLLMJSON } from "../utils/llm-client".js";
+import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, ComplianceCheckResult, ToolResponse } from "../types/index.js";
 import { formatGapForAnalysis } from "../utils/data-formatter.js";

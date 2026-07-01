@@ -1,4 +1,4 @@
-import { callLLMJSON } from "../utils/llm-client".js";
+import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, AnalysisResult, ToolResponse } from "../types/index.js";
 import {
@@ -54,11 +54,9 @@ ${Object.entries(byAssetType)
 Identify patterns and provide analysis.
     `.trim();
 
-    const result = await callLLMJSON<AnalysisResult>(
-      userMessage,
-      getPrompt("ANALYZE_GAPS"),
-      { maxTokens: 2000 }
-    );
+    const result = await callLLMJSON<AnalysisResult>(userMessage, getPrompt("ANALYZE_GAPS"), {
+      maxTokens: 2000,
+    });
 
     return {
       success: true,

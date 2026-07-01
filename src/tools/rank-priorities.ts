@@ -1,4 +1,4 @@
-import { callLLMJSON } from "../utils/llm-client".js";
+import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, RankedGap, ToolResponse } from "../types/index.js";
 import { formatGapsForAnalysis, sortByRiskScore } from "../utils/data-formatter.js";

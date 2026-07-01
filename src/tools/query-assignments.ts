@@ -1,7 +1,6 @@
-import { callLLMJSON } from "../utils/llm-client".js";
+import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, QueryResult, ToolResponse } from "../types/index.js";
-import { filterByJurisdiction, filterByRiskLevel } from "../utils/data-formatter.js";
 
 interface QueryInput {
   question: string;

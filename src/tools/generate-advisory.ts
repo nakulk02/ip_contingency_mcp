@@ -1,4 +1,4 @@
-import { callLLM } from "../utils/llm-client".js";
+import { callLLM } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, AdvisoryReport, ActionItem, ToolResponse } from "../types/index.js";
 import {
@@ -19,7 +19,9 @@ interface AdvisoryInput {
 /**
  * Generate executive advisory report
  */
-export async function generateAdvisory(input: AdvisoryInput): Promise<ToolResponse<AdvisoryReport>> {
+export async function generateAdvisory(
+  input: AdvisoryInput
+): Promise<ToolResponse<AdvisoryReport>> {
   try {
     const { gaps, companyContext = {} } = input;
 
@@ -97,10 +99,7 @@ Use clear, concise language suitable for legal review.
  * Extract section from advisory text
  */
 function extractSection(text: string, sectionName: string): string {
-  const regex = new RegExp(
-    `${sectionName}[:\s]+([^]*?)(?=\\n\\d+\\.|\\nFinancial Impact|$)`,
-    "i"
-  );
+  const regex = new RegExp(`${sectionName}[:\s]+([^]*?)(?=\\n\\d+\\.|\\nFinancial Impact|$)`, "i");
   const match = text.match(regex);
   return match ? match[1].trim() : "";
 }
