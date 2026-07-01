@@ -5,6 +5,7 @@ dotenv.config();
 import { TOOLS, listTools } from "./tools/index.js";
 import { ToolResponse } from "./types/index.js";
 import { toToolResponse } from "./utils/tool-response.js";
+import { logger } from "./utils/logger.js";
 
 /**
  * MCP Server for IP Contingency Intelligence
@@ -22,10 +23,12 @@ interface ToolCall {
  */
 export async function processTool(toolCall: ToolCall): Promise<ToolResponse<any>> {
   const { tool, input } = toolCall;
+  const start = Date.now();
 
   const toolFn = TOOLS[tool as keyof typeof TOOLS];
 
   if (!toolFn) {
+    logger.warn({ tool }, "Tool not found");
     return {
       success: false,
       error: `Tool not found: ${tool}. Available tools: ${listTools().join(", ")}`,
@@ -34,8 +37,14 @@ export async function processTool(toolCall: ToolCall): Promise<ToolResponse<any>
   }
 
   try {
-    return await toolFn(input);
+    const result = await toolFn(input);
+    logger.debug(
+      { tool, success: result.success, durationMs: Date.now() - start },
+      "Tool execution completed"
+    );
+    return result;
   } catch (error) {
+    logger.error({ tool, err: error, durationMs: Date.now() - start }, "Tool execution failed");
     return toToolResponse(error);
   }
 }
@@ -82,9 +91,8 @@ export function getToolDescriptions() {
 
 // Main entry point
 if (import.meta.url === `file://${process.argv[1]}`) {
-  console.log("IP Contingency MCP Server");
-  console.log("Available tools:", listTools());
-  console.log("\nTool descriptions:");
+  logger.info({ tools: listTools() }, "IP Contingency MCP Server starting");
+  // eslint-disable-next-line no-console
   console.log(JSON.stringify(getToolDescriptions(), null, 2));
 }
 
