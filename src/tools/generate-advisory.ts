@@ -7,6 +7,8 @@ import {
   getHighRiskJurisdictionGaps,
   calculateGapStatistics,
 } from "../utils/data-formatter.js";
+import { ToolInputError } from "../utils/errors.js";
+import { toToolResponse } from "../utils/tool-response.js";
 
 interface AdvisoryInput {
   gaps: AssignmentGap[];
@@ -26,11 +28,7 @@ export async function generateAdvisory(
     const { gaps, companyContext = {} } = input;
 
     if (!gaps || gaps.length === 0) {
-      return {
-        success: false,
-        error: "No gaps provided for advisory generation",
-        timestamp: new Date(),
-      };
+      throw new ToolInputError("No gaps provided for advisory generation");
     }
 
     const statistics = calculateGapStatistics(gaps);
@@ -87,11 +85,7 @@ Use clear, concise language suitable for legal review.
       timestamp: new Date(),
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to generate advisory: ${error instanceof Error ? error.message : String(error)}`,
-      timestamp: new Date(),
-    };
+    return toToolResponse<AdvisoryReport>(error);
   }
 }
 

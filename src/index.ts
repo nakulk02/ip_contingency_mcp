@@ -4,6 +4,7 @@ dotenv.config();
 
 import { TOOLS, listTools } from "./tools/index.js";
 import { ToolResponse } from "./types/index.js";
+import { toToolResponse } from "./utils/tool-response.js";
 
 /**
  * MCP Server for IP Contingency Intelligence
@@ -35,11 +36,7 @@ export async function processTool(toolCall: ToolCall): Promise<ToolResponse<any>
   try {
     return await toolFn(input);
   } catch (error) {
-    return {
-      success: false,
-      error: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
-      timestamp: new Date(),
-    };
+    return toToolResponse(error);
   }
 }
 

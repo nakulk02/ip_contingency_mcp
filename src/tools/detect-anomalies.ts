@@ -6,6 +6,8 @@ import {
   sortByDaysOverdue,
   calculateGapStatistics,
 } from "../utils/data-formatter.js";
+import { ToolInputError } from "../utils/errors.js";
+import { toToolResponse } from "../utils/tool-response.js";
 
 interface AnomalyDetectionInput {
   gaps: AssignmentGap[];
@@ -26,11 +28,7 @@ export async function detectAnomalies(
     const { gaps, context = {} } = input;
 
     if (!gaps || gaps.length === 0) {
-      return {
-        success: false,
-        error: "No gaps provided for anomaly detection",
-        timestamp: new Date(),
-      };
+      throw new ToolInputError("No gaps provided for anomaly detection");
     }
 
     // Sort by days overdue to highlight extreme cases
@@ -69,11 +67,7 @@ Identify any unusual patterns, suspicious delays, compliance violations, or risk
       timestamp: new Date(),
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to detect anomalies: ${error instanceof Error ? error.message : String(error)}`,
-      timestamp: new Date(),
-    };
+    return toToolResponse<Anomaly[]>(error);
   }
 }
 

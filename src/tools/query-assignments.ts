@@ -1,6 +1,8 @@
 import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, QueryResult, ToolResponse } from "../types/index.js";
+import { ToolInputError } from "../utils/errors.js";
+import { toToolResponse } from "../utils/tool-response.js";
 
 interface QueryInput {
   question: string;
@@ -26,11 +28,7 @@ export async function queryAssignments(input: QueryInput): Promise<ToolResponse<
     const { question, gaps } = input;
 
     if (!question || !gaps) {
-      return {
-        success: false,
-        error: "Question and gaps required",
-        timestamp: new Date(),
-      };
+      throw new ToolInputError("Question and gaps required");
     }
 
     // First, ask LLM to interpret the question
@@ -76,11 +74,7 @@ export async function queryAssignments(input: QueryInput): Promise<ToolResponse<
       timestamp: new Date(),
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to process query: ${error instanceof Error ? error.message : String(error)}`,
-      timestamp: new Date(),
-    };
+    return toToolResponse<QueryResult>(error);
   }
 }
 

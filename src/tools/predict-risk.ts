@@ -2,6 +2,8 @@ import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, Prediction, ToolResponse } from "../types/index.js";
 import { formatGapForAnalysis } from "../utils/data-formatter.js";
+import { ToolInputError } from "../utils/errors.js";
+import { toToolResponse } from "../utils/tool-response.js";
 
 interface PredictionInput {
   gap: AssignmentGap;
@@ -20,11 +22,7 @@ export async function predictRisk(input: PredictionInput): Promise<ToolResponse<
     const { gap, historicalContext = {} } = input;
 
     if (!gap) {
-      return {
-        success: false,
-        error: "No gap provided",
-        timestamp: new Date(),
-      };
+      throw new ToolInputError("No gap provided");
     }
 
     const formattedGap = formatGapForAnalysis(gap);
@@ -60,11 +58,7 @@ Provide confidence level and reasoning.
       timestamp: new Date(),
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to predict risk: ${error instanceof Error ? error.message : String(error)}`,
-      timestamp: new Date(),
-    };
+    return toToolResponse<Prediction>(error);
   }
 }
 

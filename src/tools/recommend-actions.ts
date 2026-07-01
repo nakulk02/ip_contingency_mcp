@@ -2,6 +2,8 @@ import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, Recommendation, ToolResponse } from "../types/index.js";
 import { formatGapForAnalysis } from "../utils/data-formatter.js";
+import { ToolInputError } from "../utils/errors.js";
+import { toToolResponse } from "../utils/tool-response.js";
 
 interface RecommendationInput {
   gap: AssignmentGap;
@@ -17,11 +19,7 @@ export async function recommendActions(
     const { gap } = input;
 
     if (!gap) {
-      return {
-        success: false,
-        error: "No gap provided",
-        timestamp: new Date(),
-      };
+      throw new ToolInputError("No gap provided");
     }
 
     const formattedGap = formatGapForAnalysis(gap);
@@ -48,11 +46,7 @@ Provide specific, actionable recommendations for next steps.
       timestamp: new Date(),
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to generate recommendations: ${error instanceof Error ? error.message : String(error)}`,
-      timestamp: new Date(),
-    };
+    return toToolResponse<Recommendation>(error);
   }
 }
 

@@ -2,6 +2,8 @@ import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, RankedGap, ToolResponse } from "../types/index.js";
 import { formatGapsForAnalysis, sortByRiskScore } from "../utils/data-formatter.js";
+import { ToolInputError } from "../utils/errors.js";
+import { toToolResponse } from "../utils/tool-response.js";
 
 interface RankingInput {
   gaps: AssignmentGap[];
@@ -28,11 +30,7 @@ export async function rankPriorities(input: RankingInput): Promise<ToolResponse<
     const { gaps } = input;
 
     if (!gaps || gaps.length === 0) {
-      return {
-        success: false,
-        error: "No gaps provided for ranking",
-        timestamp: new Date(),
-      };
+      throw new ToolInputError("No gaps provided for ranking");
     }
 
     const sortedByRisk = sortByRiskScore(gaps);
@@ -62,7 +60,7 @@ Provide priority scores (1-100) and explain reasoning.
     // Combine ranking with original gap data
     const ranked = rankingResult.ranked.map((item, idx) => {
       const gap = gaps.find((g) => g.id === item.gapId);
-      if (!gap) throw new Error(`Gap ${item.gapId} not found`);
+      if (!gap) throw new ToolInputError(`Gap ${item.gapId} not found in provided gaps`);
 
       return {
         ...gap,
@@ -80,11 +78,7 @@ Provide priority scores (1-100) and explain reasoning.
       timestamp: new Date(),
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to rank priorities: ${error instanceof Error ? error.message : String(error)}`,
-      timestamp: new Date(),
-    };
+    return toToolResponse<RankedGap[]>(error);
   }
 }
 

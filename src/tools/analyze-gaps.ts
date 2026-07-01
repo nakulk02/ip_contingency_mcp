@@ -7,6 +7,8 @@ import {
   groupGapsByAssetType,
   calculateGapStatistics,
 } from "../utils/data-formatter.js";
+import { ToolInputError } from "../utils/errors.js";
+import { toToolResponse } from "../utils/tool-response.js";
 
 interface AnalysisInput {
   gaps: AssignmentGap[];
@@ -20,11 +22,7 @@ export async function analyzeGaps(input: AnalysisInput): Promise<ToolResponse<An
     const { gaps } = input;
 
     if (!gaps || gaps.length === 0) {
-      return {
-        success: false,
-        error: "No gaps provided for analysis",
-        timestamp: new Date(),
-      };
+      throw new ToolInputError("No gaps provided for analysis");
     }
 
     // Prepare data for LLM
@@ -65,11 +63,7 @@ Identify patterns and provide analysis.
       timestamp: new Date(),
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to analyze gaps: ${error instanceof Error ? error.message : String(error)}`,
-      timestamp: new Date(),
-    };
+    return toToolResponse<AnalysisResult>(error);
   }
 }
 
