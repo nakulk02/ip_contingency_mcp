@@ -7,7 +7,13 @@ export default {
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts", "!src/index.ts", "!src/**/__tests__/**"],
+  collectCoverageFrom: [
+    "src/**/*.ts",
+    "!src/**/*.d.ts",
+    "!src/index.ts",
+    "!src/**/__tests__/**",
+    "!src/**/__test-helpers__/**",
+  ],
   coverageThreshold: {
     global: {
       branches: 50,
