@@ -1,9 +1,32 @@
 import pino from "pino";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+/**
+ * pino-pretty is a devDependency of this package, not a production one,
+ * since it's only meant to make this repo's own CLI/dev output readable.
+ * When this package is consumed as a library by another app (e.g. the
+ * main tracker app importing this as ip-contingency-mcp), pino-pretty
+ * won't be installed in the consumer's node_modules, and pointing pino
+ * at a transport it can't resolve crashes at import time. Check
+ * availability first and fall back to plain JSON logging instead.
+ */
+function isPinoPrettyAvailable() {
+    try {
+        require.resolve("pino-pretty");
+        return true;
+    }
+    catch {
+        return false;
+    }
+}
+const usePretty = process.env.NODE_ENV !== "production" && isPinoPrettyAvailable();
 /**
  * Structured logger for the intelligence tool layer.
  *
  * - In production: emits JSON lines (suitable for log aggregation).
- * - In development: emits human-readable, colorized output via pino-pretty.
+ * - In development, when pino-pretty is available: emits human-readable,
+ *   colorized output.
+ * - Otherwise: emits plain JSON lines regardless of environment.
  *
  * Usage:
  *   logger.info({ tool: "analyzeGaps" }, "tool invoked");
@@ -11,7 +34,7 @@ import pino from "pino";
  */
 export const logger = pino({
     level: process.env.LOG_LEVEL || (process.env.NODE_ENV === "production" ? "info" : "debug"),
-    ...(process.env.NODE_ENV !== "production"
+    ...(usePretty
         ? {
             transport: {
                 target: "pino-pretty",
