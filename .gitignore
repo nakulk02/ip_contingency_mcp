@@ -1,9 +1,13 @@
 node_modules/
-dist/
 build/
 *.js
 *.js.map
 *.d.ts
+# dist/ is intentionally NOT ignored: this package is consumed as a git
+# dependency (github:nakulk02/ip_contingency_mcp), and npm v12 blocks
+# prepare scripts for git dependencies by default, so the build output
+# must be committed rather than generated on install.
+!dist/**
 .DS_Store
 .env
 .env.local

@@ -1,4 +1,9 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 npx lint-staged
+
+# Rebuild dist/ if any source file changed, so committed build output
+# never drifts from src/. This repo is consumed as a git dependency,
+# so dist/ must always reflect what's staged.
+if git diff --cached --name-only | grep -q '^src/'; then
+  npm run build
+  git add dist
+fi
