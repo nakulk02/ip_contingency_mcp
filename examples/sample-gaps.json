@@ -1,0 +1,50 @@
+{
+  "gaps": [
+    {
+      "id": "gap-001",
+      "personId": "p-01",
+      "personName": "Li Wei",
+      "personRole": "EMPLOYEE",
+      "personStartDate": "2021-03-01",
+      "assetId": "a-01",
+      "assetTitle": "Battery thermal management system",
+      "assetType": "PATENT",
+      "assetStatus": "FILED",
+      "jurisdiction": "CN",
+      "filingDate": "2023-06-15",
+      "riskScore": 88,
+      "riskLevel": "CRITICAL",
+      "daysOverdue": 210
+    },
+    {
+      "id": "gap-002",
+      "personId": "p-02",
+      "personName": "Jonas Becker",
+      "personRole": "CONTRACTOR",
+      "personStartDate": "2022-01-10",
+      "personEndDate": "2023-02-28",
+      "assetId": "a-02",
+      "assetTitle": "Charging connector design",
+      "assetType": "PATENT",
+      "assetStatus": "PUBLISHED",
+      "jurisdiction": "DE",
+      "filingDate": "2022-11-02",
+      "riskScore": 74,
+      "riskLevel": "HIGH",
+      "daysOverdue": 140
+    },
+    {
+      "id": "gap-003",
+      "personId": "p-03",
+      "personName": "Sam Carter",
+      "personRole": "FOUNDER",
+      "personStartDate": "2020-05-01",
+      "assetType": "TRADEMARK",
+      "assetStatus": "REGISTERED",
+      "jurisdiction": "US",
+      "riskScore": 35,
+      "riskLevel": "MEDIUM",
+      "daysOverdue": 30
+    }
+  ]
+}
