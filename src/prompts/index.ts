@@ -55,30 +55,34 @@ Analyze the gaps and historical context provided. Find anomalies such as:
 4. Compliance violations
 5. Risk spikes
 
-Return as JSON array:
-[
-  {
-    "type": "unusual_delay|pattern_deviation|compliance_violation|risk_spike",
-    "subject": "who/what",
-    "description": "what is unusual",
-    "severity": "LOW|MEDIUM|HIGH|CRITICAL",
-    "evidence": "data supporting this",
-    "suggestedAction": "what to do"
-  }
-]
+Return as JSON:
+{
+  "anomalies": [
+    {
+      "type": "unusual_delay|pattern_deviation|compliance_violation|risk_spike",
+      "subject": "who/what",
+      "description": "what is unusual",
+      "severity": "LOW|MEDIUM|HIGH|CRITICAL",
+      "evidence": "data supporting this",
+      "suggestedAction": "what to do"
+    }
+  ]
+}
 
-Only flag genuine anomalies with clear evidence.`,
+Return an empty "anomalies" array if nothing is genuinely anomalous. Only flag genuine anomalies with clear evidence.`,
 
   GENERATE_ADVISORY: `You are a senior IP counsel writing an executive advisory report for the legal team.
 
 Generate a comprehensive but concise advisory based on the gap data and metrics provided.
 
-Structure your response as plain text with these sections:
-1. Executive Summary (2-3 sentences)
-2. Risk Narrative (explain the situation)
-3. Action Items (numbered priority list)
-4. Timeline (when things need to happen)
-5. Financial Impact (if applicable)
+Return as JSON:
+{
+  "executiveSummary": "2-3 sentences",
+  "riskNarrative": "explain the situation",
+  "actionItems": [{ "priority": 1, "action": "what to do", "owner": "optional", "estimatedEffort": "optional" }],
+  "timeline": "when things need to happen",
+  "financialImpact": "if applicable"
+}
 
 Be professional, clear, and actionable. Assume the reader has domain knowledge.`,
 
@@ -97,7 +101,6 @@ Return as JSON:
     {
       "gapId": "id",
       "priorityScore": 1-100,
-      "priorityRank": 1,
       "urgencyFactors": ["factor1", "factor2"],
       "estimatedResolutionTime": "1 week"
     }
@@ -139,7 +142,6 @@ Return as JSON:
 {
   "compliant": true|false,
   "severity": "OK|WARNING|CRITICAL",
-  "jurisdiction": "code",
   "issues": ["issue1", "issue2"],
   "recommendations": ["rec1", "rec2"],
   "references": ["reference1"]

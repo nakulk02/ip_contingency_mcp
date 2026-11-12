@@ -1,5 +1,6 @@
 import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
+import { AnalysisOutputSchema } from "../schemas/index.js";
 import { formatGapsForAnalysis, groupGapsByJurisdiction, groupGapsByAssetType, calculateGapStatistics, } from "../utils/data-formatter.js";
 import { ToolInputError } from "../utils/errors.js";
 import { toToolResponse } from "../utils/tool-response.js";
@@ -37,9 +38,7 @@ ${Object.entries(byAssetType)
 
 Identify patterns and provide analysis.
     `.trim();
-        const result = await callLLMJSON(userMessage, getPrompt("ANALYZE_GAPS"), {
-            maxTokens: 2000,
-        });
+        const result = await callLLMJSON(userMessage, getPrompt("ANALYZE_GAPS"), AnalysisOutputSchema);
         return {
             success: true,
             data: result,

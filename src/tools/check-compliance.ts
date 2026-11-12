@@ -1,6 +1,7 @@
 import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, ComplianceCheckResult, ToolResponse } from "../types/index.js";
+import { ComplianceOutputSchema } from "../schemas/index.js";
 import { formatGapForAnalysis } from "../utils/data-formatter.js";
 import { ToolInputError } from "../utils/errors.js";
 import { toToolResponse } from "../utils/tool-response.js";
@@ -36,14 +37,12 @@ Asset Status: ${gap.assetStatus}
 Analyze against jurisdiction-specific requirements and provide compliance status.
     `.trim();
 
-    const result = await callLLMJSON<ComplianceCheckResult>(
+    const output = await callLLMJSON(
       userMessage,
       getPrompt("CHECK_COMPLIANCE"),
-      { maxTokens: 1500 }
+      ComplianceOutputSchema
     );
-
-    // Ensure jurisdiction is set
-    result.jurisdiction = gap.jurisdiction;
+    const result: ComplianceCheckResult = { ...output, jurisdiction: gap.jurisdiction };
 
     return {
       success: true,

@@ -28,6 +28,9 @@ const usePretty = process.env.NODE_ENV !== "production" && isPinoPrettyAvailable
  *   colorized output.
  * - Otherwise: emits plain JSON lines regardless of environment.
  *
+ * All output goes to stderr (fd 2). When this package runs as an MCP server
+ * over stdio, stdout carries the JSON-RPC protocol and must not be written to.
+ *
  * Usage:
  *   logger.info({ tool: "analyzeGaps" }, "tool invoked");
  *   logger.error({ err }, "tool execution failed");
@@ -42,6 +45,7 @@ export const logger = pino({
                     colorize: true,
                     translateTime: "SYS:standard",
                     ignore: "pid,hostname",
+                    destination: 2,
                 },
             },
         }
@@ -51,5 +55,5 @@ export const logger = pino({
         paths: ["apiKey", "ANTHROPIC_API_KEY", "authorization"],
         censor: "[REDACTED]",
     },
-});
+}, usePretty ? undefined : pino.destination(2));
 export default logger;

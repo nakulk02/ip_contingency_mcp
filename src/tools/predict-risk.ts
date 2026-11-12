@@ -1,6 +1,7 @@
 import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, Prediction, ToolResponse } from "../types/index.js";
+import { PredictionOutputSchema } from "../schemas/index.js";
 import { formatGapForAnalysis } from "../utils/data-formatter.js";
 import { ToolInputError } from "../utils/errors.js";
 import { toToolResponse } from "../utils/tool-response.js";
@@ -44,12 +45,12 @@ Based on the characteristics, predict whether this gap will likely:
 Provide confidence level and reasoning.
     `.trim();
 
-    const result = await callLLMJSON<Prediction>(userMessage, getPrompt("PREDICT_RISK"), {
-      maxTokens: 1500,
-    });
-
-    // Ensure gapId is set
-    result.gapId = gap.id;
+    const output = await callLLMJSON(
+      userMessage,
+      getPrompt("PREDICT_RISK"),
+      PredictionOutputSchema
+    );
+    const result: Prediction = { gapId: gap.id, ...output };
 
     return {
       success: true,

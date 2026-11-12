@@ -1,10 +1,14 @@
 import dotenv from "dotenv";
-dotenv.config();
+// quiet: dotenv's banner goes to stdout, which is the MCP protocol channel.
+dotenv.config({ quiet: true });
 import { TOOLS, listTools } from "./tools/index.js";
 import { toToolResponse } from "./utils/tool-response.js";
 import { logger } from "./utils/logger.js";
+import { withUsageTracking } from "./utils/usage.js";
+import { TOOL_DESCRIPTIONS } from "./mcp/tool-definitions.js";
 /**
- * Process a tool call
+ * Run a tool by name. Logs the tool's duration and the total token usage of
+ * the LLM calls it made, and attaches that usage to the response.
  */
 export async function processTool(toolCall) {
     const { tool, input } = toolCall;
@@ -19,9 +23,10 @@ export async function processTool(toolCall) {
         };
     }
     try {
-        const result = await toolFn(input);
-        logger.debug({ tool, success: result.success, durationMs: Date.now() - start }, "Tool execution completed");
-        return result;
+        const { result, usage } = await withUsageTracking(() => toolFn(input));
+        const durationMs = Date.now() - start;
+        logger.info({ tool, success: result.success, durationMs, ...usage }, "Tool execution completed");
+        return { ...result, usage: { ...usage, durationMs } };
     }
     catch (error) {
         logger.error({ tool, err: error, durationMs: Date.now() - start }, "Tool execution failed");
@@ -32,45 +37,7 @@ export async function processTool(toolCall) {
  * Get tool descriptions
  */
 export function getToolDescriptions() {
-    return {
-        analyzeGaps: {
-            description: "Analyze IP ownership gaps to identify patterns and risk areas",
-            input: { gaps: "AssignmentGap[]" },
-        },
-        recommendActions: {
-            description: "Generate specific recommendations for resolving an IP assignment gap",
-            input: { gap: "AssignmentGap" },
-        },
-        detectAnomalies: {
-            description: "Detect unusual patterns and red flags in IP assignment data",
-            input: { gaps: "AssignmentGap[]", context: "optional context object" },
-        },
-        generateAdvisory: {
-            description: "Generate executive advisory report on IP assignment compliance",
-            input: { gaps: "AssignmentGap[]", companyContext: "optional company info" },
-        },
-        rankPriorities: {
-            description: "Rank gaps by strategic priority and urgency",
-            input: { gaps: "AssignmentGap[]" },
-        },
-        queryAssignments: {
-            description: "Search and filter gaps using natural language",
-            input: { question: "string", gaps: "AssignmentGap[]" },
-        },
-        checkCompliance: {
-            description: "Check compliance of a gap against jurisdiction-specific rules",
-            input: { gap: "AssignmentGap" },
-        },
-        predictRisk: {
-            description: "Predict likely outcome and risk for a gap",
-            input: { gap: "AssignmentGap", historicalContext: "optional context" },
-        },
-    };
+    return TOOL_DESCRIPTIONS;
 }
-// Main entry point
-if (import.meta.url === `file://${process.argv[1]}`) {
-    logger.info({ tools: listTools() }, "IP Contingency MCP Server starting");
-    // eslint-disable-next-line no-console
-    console.log(JSON.stringify(getToolDescriptions(), null, 2));
-}
-export default { processTool, getToolDescriptions, listTools: listTools };
+export { TOOLS, listTools };
+export default { processTool, getToolDescriptions, listTools };

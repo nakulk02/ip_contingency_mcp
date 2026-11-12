@@ -1,5 +1,6 @@
 import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
+import { AnomalyOutputSchema } from "../schemas/index.js";
 import { formatGapsForAnalysis, sortByDaysOverdue, calculateGapStatistics, } from "../utils/data-formatter.js";
 import { ToolInputError } from "../utils/errors.js";
 import { toToolResponse } from "../utils/tool-response.js";
@@ -31,11 +32,11 @@ TOTAL GAPS ANALYZED: ${gaps.length}${contextInfo}
 
 Identify any unusual patterns, suspicious delays, compliance violations, or risk spikes.
     `.trim();
-        const results = await callLLMJSON(userMessage, getPrompt("DETECT_ANOMALIES"), {
-            maxTokens: 2000,
-        });
-        // Ensure it's an array
-        const anomalies = Array.isArray(results) ? results : [results];
+        const output = await callLLMJSON(userMessage, getPrompt("DETECT_ANOMALIES"), AnomalyOutputSchema);
+        const anomalies = output.anomalies.map((a, idx) => ({
+            id: `anomaly-${idx + 1}`,
+            ...a,
+        }));
         return {
             success: true,
             data: anomalies,

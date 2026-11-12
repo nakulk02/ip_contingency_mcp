@@ -1,23 +1,13 @@
 import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, QueryResult, ToolResponse } from "../types/index.js";
+import { QueryInterpretationSchema } from "../schemas/index.js";
 import { ToolInputError } from "../utils/errors.js";
 import { toToolResponse } from "../utils/tool-response.js";
 
 interface QueryInput {
   question: string;
   gaps: AssignmentGap[];
-}
-
-interface QueryInterpretation {
-  interpretation: string;
-  filters: {
-    jurisdiction?: string[];
-    assetType?: ("PATENT" | "TRADEMARK")[];
-    riskLevel?: ("LOW" | "MEDIUM" | "HIGH" | "CRITICAL")[];
-    personStatus?: "current" | "former" | "either";
-  };
-  explanation: string;
 }
 
 /**
@@ -32,10 +22,10 @@ export async function queryAssignments(input: QueryInput): Promise<ToolResponse<
     }
 
     // First, ask LLM to interpret the question
-    const interpretation = await callLLMJSON<QueryInterpretation>(
+    const interpretation = await callLLMJSON(
       `User question about IP assignments: "${question}"`,
       getPrompt("QUERY_ASSIGNMENTS"),
-      { maxTokens: 1000 }
+      QueryInterpretationSchema
     );
 
     // Apply filters to gaps

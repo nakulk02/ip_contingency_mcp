@@ -70,6 +70,14 @@ export interface ToolResponse<T> {
     error?: string;
     reasoning?: string;
     timestamp: Date;
+    /** Token usage and latency for the LLM calls this tool made. */
+    usage?: {
+        llmCalls: number;
+        inputTokens: number;
+        outputTokens: number;
+        llmLatencyMs: number;
+        durationMs: number;
+    };
 }
 export interface QueryResult {
     count: number;
