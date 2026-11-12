@@ -21,7 +21,9 @@ Days Overdue: ${gap.daysOverdue}
  * Format multiple gaps for analysis
  */
 export function formatGapsForAnalysis(gaps) {
-    return gaps.map((gap, idx) => `Gap ${idx + 1}:\n${formatGapForAnalysis(gap)}`).join("\n\n---\n\n");
+    return gaps
+        .map((gap, idx) => `Gap ${idx + 1}:\n${formatGapForAnalysis(gap)}`)
+        .join("\n\n---\n\n");
 }
 /**
  * Format gap summary (compact)

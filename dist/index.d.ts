@@ -1,75 +1,29 @@
-import { listTools } from "./tools/index.js";
+import { TOOLS, listTools } from "./tools/index.js";
 import { ToolResponse } from "./types/index.js";
 /**
- * MCP Server for IP Contingency Intelligence
+ * IP Contingency Intelligence: library entry point.
  *
- * Provides intelligent analysis tools for IP assignment compliance
+ * `processTool()` runs one of the 8 tools in-process. The tracker app imports
+ * it directly. The same tools are exposed over the Model Context Protocol
+ * by src/server.ts.
  */
-interface ToolCall {
+export interface ToolCall {
     tool: string;
     input: any;
 }
 /**
- * Process a tool call
+ * Run a tool by name. Logs the tool's duration and the total token usage of
+ * the LLM calls it made, and attaches that usage to the response.
  */
 export declare function processTool(toolCall: ToolCall): Promise<ToolResponse<any>>;
 /**
  * Get tool descriptions
  */
-export declare function getToolDescriptions(): {
-    analyzeGaps: {
-        description: string;
-        input: {
-            gaps: string;
-        };
-    };
-    recommendActions: {
-        description: string;
-        input: {
-            gap: string;
-        };
-    };
-    detectAnomalies: {
-        description: string;
-        input: {
-            gaps: string;
-            context: string;
-        };
-    };
-    generateAdvisory: {
-        description: string;
-        input: {
-            gaps: string;
-            companyContext: string;
-        };
-    };
-    rankPriorities: {
-        description: string;
-        input: {
-            gaps: string;
-        };
-    };
-    queryAssignments: {
-        description: string;
-        input: {
-            question: string;
-            gaps: string;
-        };
-    };
-    checkCompliance: {
-        description: string;
-        input: {
-            gap: string;
-        };
-    };
-    predictRisk: {
-        description: string;
-        input: {
-            gap: string;
-            historicalContext: string;
-        };
-    };
-};
+export declare function getToolDescriptions(): Record<"analyzeGaps" | "recommendActions" | "detectAnomalies" | "generateAdvisory" | "rankPriorities" | "queryAssignments" | "checkCompliance" | "predictRisk", {
+    description: string;
+    input: Record<string, string>;
+}>;
+export { TOOLS, listTools };
 declare const _default: {
     processTool: typeof processTool;
     getToolDescriptions: typeof getToolDescriptions;

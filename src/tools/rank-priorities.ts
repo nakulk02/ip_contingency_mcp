@@ -1,25 +1,13 @@
 import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
 import { AssignmentGap, RankedGap, ToolResponse } from "../types/index.js";
+import { RankingOutputSchema } from "../schemas/index.js";
 import { formatGapsForAnalysis, sortByRiskScore } from "../utils/data-formatter.js";
 import { ToolInputError } from "../utils/errors.js";
 import { toToolResponse } from "../utils/tool-response.js";
 
 interface RankingInput {
   gaps: AssignmentGap[];
-}
-
-interface RankingResult {
-  ranked: RankedItem[];
-  methodology: string;
-}
-
-interface RankedItem {
-  gapId: string;
-  priorityScore: number;
-  priorityRank: number;
-  urgencyFactors: string[];
-  estimatedResolutionTime: string;
 }
 
 /**
@@ -51,10 +39,10 @@ ${formattedGaps}
 Provide priority scores (1-100) and explain reasoning.
     `.trim();
 
-    const rankingResult = await callLLMJSON<RankingResult>(
+    const rankingResult = await callLLMJSON(
       userMessage,
       getPrompt("RANK_PRIORITIES"),
-      { maxTokens: 2000 }
+      RankingOutputSchema
     );
 
     // Combine ranking with original gap data

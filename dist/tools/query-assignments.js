@@ -1,5 +1,6 @@
 import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
+import { QueryInterpretationSchema } from "../schemas/index.js";
 import { ToolInputError } from "../utils/errors.js";
 import { toToolResponse } from "../utils/tool-response.js";
 /**
@@ -12,7 +13,7 @@ export async function queryAssignments(input) {
             throw new ToolInputError("Question and gaps required");
         }
         // First, ask LLM to interpret the question
-        const interpretation = await callLLMJSON(`User question about IP assignments: "${question}"`, getPrompt("QUERY_ASSIGNMENTS"), { maxTokens: 1000 });
+        const interpretation = await callLLMJSON(`User question about IP assignments: "${question}"`, getPrompt("QUERY_ASSIGNMENTS"), QueryInterpretationSchema);
         // Apply filters to gaps
         let filtered = [...gaps];
         if (interpretation.filters.jurisdiction && interpretation.filters.jurisdiction.length > 0) {

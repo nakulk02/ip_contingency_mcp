@@ -1,6 +1,7 @@
-import { callLLM } from "../utils/llm-client.js";
+import { callLLMJSON } from "../utils/llm-client.js";
 import { getPrompt } from "../prompts/index.js";
-import { AssignmentGap, AdvisoryReport, ActionItem, ToolResponse } from "../types/index.js";
+import { AssignmentGap, AdvisoryReport, ToolResponse } from "../types/index.js";
+import { AdvisoryOutputSchema } from "../schemas/index.js";
 import {
   formatGapsForAnalysis,
   getCriticalGaps,
@@ -52,29 +53,23 @@ HIGH-RISK JURISDICTION GAPS: ${highRiskJurisdictionGaps.length}
 TOP GAPS FOR REVIEW:
 ${formattedGaps}
 
-Write a professional advisory report with:
-1. Executive Summary
-2. Risk Narrative
-3. Action Items (numbered)
-4. Timeline
-5. Financial Impact (if quantifiable)
+Write a professional advisory report covering an executive summary, a risk narrative,
+prioritised action items, a timeline and the financial impact (if quantifiable).
 
 Use clear, concise language suitable for legal review.
     `.trim();
 
-    const advisoryText = await callLLM(userMessage, getPrompt("GENERATE_ADVISORY"), {
-      maxTokens: 2500,
-    });
+    const advisory = await callLLMJSON(
+      userMessage,
+      getPrompt("GENERATE_ADVISORY"),
+      AdvisoryOutputSchema
+    );
 
-    // Parse the advisory text into structured format
     const report: AdvisoryReport = {
       generatedAt: new Date(),
       title: "IP Assignment Compliance Advisory",
-      executiveSummary: extractSection(advisoryText, "Executive Summary"),
-      riskNarrative: extractSection(advisoryText, "Risk Narrative"),
-      actionItems: parseActionItems(extractSection(advisoryText, "Action Items")),
-      timeline: extractSection(advisoryText, "Timeline"),
-      financialImpact: extractSection(advisoryText, "Financial Impact"),
+      ...advisory,
+      actionItems: [...advisory.actionItems].sort((x, y) => x.priority - y.priority),
       keyMetrics: statistics,
     };
 
@@ -87,28 +82,6 @@ Use clear, concise language suitable for legal review.
   } catch (error) {
     return toToolResponse<AdvisoryReport>(error);
   }
-}
-
-/**
- * Extract section from advisory text
- */
-function extractSection(text: string, sectionName: string): string {
-  const regex = new RegExp(`${sectionName}[:\s]+([^]*?)(?=\\n\\d+\\.|\\nFinancial Impact|$)`, "i");
-  const match = text.match(regex);
-  return match ? match[1].trim() : "";
-}
-
-/**
- * Parse action items from text
- */
-function parseActionItems(text: string): ActionItem[] {
-  const lines = text.split("\n").filter((line) => line.trim());
-  return lines
-    .map((line, idx) => ({
-      priority: idx + 1,
-      action: line.replace(/^\d+\.\s*/, "").trim(),
-    }))
-    .filter((item) => item.action.length > 0);
 }
 
 export default generateAdvisory;
